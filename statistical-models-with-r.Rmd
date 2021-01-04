@@ -1,0 +1,671 @@
+---
+title: "Statistical Models with R"
+author: "Nick Brooks"
+date: "March 12, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+## Packages
+```{r message=FALSE}
+#Data
+require(MASS)
+require(ISLR) 
+require(fmsb)
+#knn
+require(class)
+#Clustering
+require(fpc)
+#Variable Selection (basic)
+require(leaps)
+#Lasso/Ridge
+require(glmnet)
+#Trees
+require(tree)
+require(gbm)
+require(randomForest)
+# Non-Linear
+require(gam)
+require(akima)
+require(splines)
+```
+
+# Function
+
+```{r}
+regplot=function(x,y,...){
+  fit=lm(y~x)
+  plot(x,y,...)
+  abline(fit,col="red")
+}
+# (...) indicates flexibility to add "blank" when executing function, in this case, graphical aspects to plot(x,y,...)
+
+regplot(Carseats$Price,Carseats$Sales,xlab="Price",ylab="Sales",col="blue",pch=20)
+```
+
+# Supervised Learning
+
+## Simple Linear Regression
+
+### Basic
+
+```{r}
+fit1 <- lm(medv~lstat,data=Boston)
+#lstat = lower status of the population percent // medv = median value of owner-occupied homes in \$1000s.
+summary(fit1) 
+confint(fit1) #95% CI by default
+plot(medv~lstat, Boston)
+abline(fit1, col="red") #Add the Line of Best Fit
+predict(fit1, data.frame(lstat=c(5,10,15,20,25,30)),interval="confidence")
+```
+
+```{r}
+#Collinearity
+VIF(fit1)
+
+### NON-LINEAR TERMS and INTERACTIONS
+fit5 <- lm(medv~lstat*age, Boston)
+
+#Manual QUatradic Linear Function
+#Protect exponent with I(), and ; to have 2 commands in 1 line (seperator)
+fit6 <- lm(medv~lstat +I(lstat^2),Boston)
+
+
+###QUALITATIVE PREDICTORS!
+#Sales is Dependent Var, and everything else are Independent
+cfit1 <- lm(Sales~.+Income:Advertising+Age:Price,Carseats)
+#Examine Qualitative Variable Dummy Style (what is 0/1)
+contrasts(Carseats$ShelveLoc)
+```
+
+### Ploting Linear Models
+```{r}
+plot(medv~lstat, pch=20, data=Boston)
+points(Boston$lstat,fitted(fit6),col="red",pch=20) #use points to create the quadradic line (since abline dont work here)
+
+#Polynomial Function of LM
+fit7 <- lm(medv~poly(lstat,4), data=Boston)
+summary(fit7)
+VIF(fit7)
+points(Boston$lstat,fitted(fit7),col="blue",pch=20)
+legend ("topright",legend =c("Cubic " ,"Quadratic"), col=c("red"," blue "),lty =1, lwd =2, cex =.8)
+```
+
+Lines may also be optimized for error, 
+
+# Classification Models
+
+## KNN
+
+## Trees
+#### Standard
+
+```{r}
+hist(Carseats$Sales)
+High <- ifelse(Carseats$Sales<=8, "No","Yes")
+carseats <-data.frame(Carseats[,-1],High)
+
+tree.carseats <- tree(High~.,data=carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats,pretty=0)
+```
+
+Simple trees typically have low accuracy.
+
+#### Validation
+```{r}
+set.seed(1011)
+train<-sample(1:nrow(carseats),250)
+tree.carseats<-tree(High~.,carseats,subset=train)
+summary(tree.carseats)
+plot(tree.carseats);text(tree.carseats,pretty=0)
+tree.pred=predict(tree.carseats,carseats[-train,],type="class") #Predict Label with "class"
+
+#Confusion Matrix
+with(carseats[-train,],table(tree.pred,High))
+# table(tree.pred,carseats$High[-train])
+```
+
+### Pruning with CV
+```{r}
+cv.carseats<- cv.tree(tree.carseats,FUN=prune.misclass) #find Size
+print(cv.carseats) #class prune
+plot(cv.carseats)
+par(mfrow =c(1,2))
+plot(cv.carseats$size ,cv.carseats$dev ,type="b")
+plot(cv.carseats$k ,cv.carseats$dev ,type="b")
+#links the smallest result directly
+prune.carseats<-prune.misclass(tree.carseats,best=cv.carseats$size[which.min(cv.carseats$dev)]) 
+summary(prune.carseats)
+par(mfrow =c(1,1))
+plot(prune.carseats);text(prune.carseats,pretty=0)
+tree.pred=predict(tree.carseats,carseats[-train,],type="class") #Pred Label
+table.out <- with(carseats[-train,],table(tree.pred,High))
+(table.out[1,1]+table.out[1,1])/nrow(carseats[-train,]) #Accuracy
+```
+
+which.min() returns the index.
+
+Size is number of terminal nodes
+
+## Random Forest Trees
+```{r}
+require(randomForest)
+train<- sample(1:nrow(Boston),300)
+rf.boston<-randomForest(medv~.,data=Boston,subset=train)
+rf.boston
+```
+
+500 trees were grown. Deep and bushy.
+MSE = Out of Bag (Unbiased) - observations ignored by its boost.
+
+Not quite the same as out of sample MSE.
+
+#### Tuning Split, MTRY- Size of tree growth
+
+13 is the amount
+
+```{r}
+oob.err<-double(13)
+test.err=double(13)
+for(mtry in 1:13){
+  fit<-randomForest(medv~.,data=Boston, subset=train,mtry=mtry,ntree=400)
+  oob.err[mtry]<-fit$mse[400] #out of bag error
+  pred<- predict(fit,Boston[-train,]) #apply to test
+  test.err[mtry]<- with(Boston[-train,],mean((medv-pred)^2)) #compute MSE
+  # cat(mtry," ") #See progresss
+}
+matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("Test","OBB.ERR"),pch=19, col=c("red","blue"))
+
+```
+
+Gets of variance through averaging. Testing error may be volatile.
+Choose somewhere between minimum OOS MSE and OOB MSE.
+
+### Boosting
+```{r}
+require(gbm)
+boost.boston<- gbm(medv~., data=Boston[train,],distribution="gaussian",n.tree=10000, shrinkage=.01, interaction.depth=4)
+#Variable Important Plot
+summary(boost.boston) #Need to fit more y-lab
+plot(boost.boston,i="lstat", main="lstat vs medv")
+plot(boost.boston,i="rm", main="rm vs medv")
+```
+
+Grows small trees.
+
+Tuning Parameters:
+Shrinkage= 
+Interaction.depth=
+
+```{r}
+n.trees<- seq(from=100,to=10000,by=100)
+predmat=predict(boost.boston,newdata=Boston[-train,], n.trees<- n.trees)
+dim(predmat)
+berr <-with(Boston[-train,],apply((predmat-medv)^2,2,mean))
+plot(n.trees,berr,pch=19,ylab="MSE", xlab="# Trees", main="Boostin Test Error")
+#Boosting vs. Forest
+abline(h=min(test.err),col="red")
+
+min(test.err)
+```
+
+Boosting may outperform forest if tuned approriately.
+
+## Logistic
+```{r}
+#LOGISTICAL REGRESSION (Categorization, Qualitative)
+glm.fit <- glm(Direction~.-Year-Today,data=Smarket, family=binomial) ; summary(glm.fit)
+glm.probs <- predict(glm.fit,type="response") ; glm.probs[1:5]
+glm.pred <- ifelse(glm.probs>0.5,"Up","Down")
+table(glm.pred,Smarket$Direction)
+mean(glm.pred==Smarket$Direction) #.52 Success Rate
+nrow(Smarket)
+
+#Making Training and Test set for LOGISTICAL REGRESSION
+train <- Smarket$Year<2005 #Categorize TRUE/FALSE (LOGICAL)- because data is time dependent, use cutoff
+table(train)
+glm.fit <-glm(Direction~.-Year-Today, data=Smarket, family=binomial, subset=train) 
+#will only use data where train=TRUE (<2005)
+glm.probs<- predict(glm.fit,newdata=Smarket[!train,],type="response")
+#Categorize UP/DOWN with Threshold of p(50)
+glm.pred <- ifelse(glm.probs > 0.5, "Up","Down")
+Direction.2005 <- Smarket$Direction[!train] #Actually Output after 2005
+table(glm.pred,Direction.2005) #Actual vs Predcit Output after 2005
+mean(glm.pred==Direction.2005)
+
+#Fit Smaller Model
+glm.fit=glm(Direction~Lag1+Lag2,data=Smarket, family=binomial, subset=train)
+glm.probs <- predict(glm.fit,newdata=Smarket[!train,], type="response")
+glm.pred <- ifelse(glm.probs >0.5, "Up","Down")
+table(glm.pred,Direction.2005)
+mean(glm.pred==Direction.2005)
+summary(glm.fit)
+```
+
+## Linear Discriminant Analysis [LDA]
+### Multiclass, Assumes normal distribution
+
+```{r}
+#Classifier able to handle multi-class response variable.
+#require(ISLR)
+#require(MASS)
+ida.fit <- lda(Direction~Lag1+Lag2, data=Smarket, subset=Year<2005) ;ida.fit
+plot(ida.fit)
+Smarket.2005 <- subset(Smarket, Year==2005)
+ida.pred <- predict(ida.fit, Smarket.2005)
+class(ida.pred)
+data.frame(ida.pred)[1:5,]
+table(ida.pred$class, Smarket.2005$Direction)
+mean(ida.pred$class==Smarket.2005$Direction)
+
+```
+
+## K- Nearest Neighbor
+## Looping Multiple K for Nearest Neighbor
+From Doing Data Science
+```{r message=FALSE}
+#Setup
+require(ISLR)
+require(class)
+```
+
+```{r}
+#Setup
+train <- Smarket$Year<2005 #CREATES TRUE/FALSE VECTOR
+set <- Smarket[,2:6]
+#Frame
+out <- data.frame(rep(0,20), rep(0,20))
+names(out) <- c("k", "Classifcation Rate")
+#Loop
+for (k in 1:20) {
+  knn1 <-knn(set[train,],set[!train,],Smarket$Direction[train], k)
+  out[k,1] <- k
+  out[k,2] <- mean(knn1==Smarket$Direction[!train]) #NOTICE !, exclude TRUE
+}
+#Plot
+plot(out, type="b", col="red")
+```
+
+Would be great to Highlight and Annotate hightest point on chart.
+
+## Dealing with Overfitting
+## Linear Model Selection with Bestsubset, Regularization, and cross-validation
+Chapter 6 of ISLR
+
+Least Squares Fitting: Good for tall data, not so much for wide.
+
+
+#### Libraries
+```{r message=FALSE}
+require(ISLR)
+require(leaps)
+Hitters <- na.omit(Hitters)
+```
+
+### Subset Selection: Variable Selection + Single Validation: Long Method
+
+Demonstration on how to conduct best subset selection at all variable levels, and perform simple, single cross validation.
+
+The procedure
+1. On Training set, calculate out of sample MSE for all model sizes.
+2. Find the model size with minimal MSE.
+3. Apply this model size to FULL data, variables may vary.
+4. Best Model Size Found
+
+```{r}
+set.seed(1)
+train <- sample(c(TRUE,FALSE), nrow(Hitters),rep=TRUE)
+test<- (!train)
+regfit.best<- regsubsets(Salary~., data=Hitters[train,],nvmax=19)
+test.mat=model.matrix (Salary~.,data=Hitters [test ,])
+val.errors=rep(NA,19)
+
+for(i in 1:19){
+  coefi=coef(regfit.best, id=i)
+  pred=test.mat[,names(coefi)]%*%coefi
+  val.errors[i]=mean((Hitters$Salary[test]-pred)^2)
+}
+
+val.errors
+plot(val.errors, type="b")
+which.min(val.errors)
+coef(regfit.best,10)
+
+regfit.best=regsubsets (Salary~.,data=Hitters ,nvmax =19)
+coef(regfit.best ,10)
+```
+
+Here, best subset is performed at #predictors
+
+### Variable Selection + 10-Fold Validation: With regsubsets predict() function
+
+```{r}
+# regsubsets predict() function, auto applies in loop
+predict.regsubsets =function (object ,newdata ,id ,...){
+  form=as.formula (object$call [[2]])
+  mat=model.matrix (form ,newdata )
+  coefi =coef(object ,id=id)
+  xvars =names (coefi )
+  mat[,xvars ]%*% coefi
+}
+k=10
+folds=sample(1:k, nrow(Hitters), replace=TRUE)
+cv.errors=matrix(NA,k,19,dimnames=list(NULL,paste(1:19)))
+
+for(j in 1:k){
+  best.fit=regsubsets(Salary~.,data=Hitters[folds!=j,],nvmax=19)
+  for(i in 1:19){
+    pred=predict(best.fit,Hitters[folds==j,], id=i)
+    cv.errors[j,i]=mean((Hitters$Salary[folds==j]-pred)^2)
+  }
+}
+mean.cv.errors=apply(cv.errors,2,mean)
+plot(mean.cv.errors, type="b")
+which.min(mean.cv.errors)
+reg.best<- regsubsets(Salary~.,data=Hitters, nvmax=19)
+coef(reg.best,which.min(mean.cv.errors))
+```
+
+## Ridge and Lasso: Variable Selection 
+
+```{r}
+require(glmnet)
+require(ISLR)
+Hitters <- na.omit(Hitters)
+str(Hitters)
+x=model.matrix(Salary~.,Hitters )[,-1] #Predictors
+y=Hitters$Salary #Response
+
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0, lambda=grid) #A=0 is ridge, A=1 is Lasso
+
+```
+
+model.matrix() creates numerical dummy variables from categorical data.
+
+glmnet() automatically standardizes variables. standardize=False for otherwise
+```{r}
+dim(coef(ridge.mod)) 
+ridge.mod$lambda[50]
+coef(ridge.mod)[,50]
+sqrt(sum(coef(ridge.mod)[-1,50]^2))
+```
+
+dim() 100 results for the 20 coefficients (with intercept)
+$lambda fetchs the lambda for the 50th iteration
+coef() displays the coefficients of the model (still standardized)
+sqrt() sum of coefficients. This is the S, or Budget. Higher lambda, lower the budget!
+
+```{r}
+predict(ridge.mod,s=50,type ="coefficients")[1:20 ,]
+```
+Predict the ridge regression coefficients for a non-computed value of Lambda
+
+```{r}
+set.seed(1)
+train=sample(1:nrow(x),nrow(x)/2)
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0, lambda=grid, thresh=1e-12)
+ridge.pred=predict(ridge.mod,s=4,newx=x[-train,])
+mean((ridge.pred-y[-train])^2)
+```
+
+Lambda =4 
+
+```{r}
+#Error from fitting only the intercept
+mean((mean(y[train])-y[-train])^2)
+#Same as 
+ridge.pred=predict(ridge.mod,s=1e10,newx=x[-train,])
+mean((ridge.pred-y[-train])^2)
+```
+
+The deviation from the mean is the same as fitting only the intercept of a model, attainable by applying 10^10 shrinkage.
+
+INTERCEPT= MEAN
+
+On the flip side of this, a minimal Lambda will lead to a model identical to OLS lm.
+
+### Ridge Cross Validation
+```{r}
+set.seed(1)
+cv.out<- cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam
+```
+
+Best Lambda Parameter found
+```{r}
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[-train,])
+mean((ridge.pred-y[-train])^2)
+
+out=glmnet(x,y,alpha =0)
+predict(out,type="coefficients",s=bestlam)[1:20,]
+```
+# Non-Linear
+## Splines
+  Also highlights methods of plotting multiple models in a scatter plot in base plots.
+
+```{r}
+str(Wage)
+fit <- lm(wage~poly(age,4), data=Wage) 
+summary(fit)
+```
+Poly of 4 is not significant. 
+
+#### Building a non-linear plot with standard error
+```{r fig.width=7,fig.height=6}
+agelims=range(Wage$age)
+age.grid=seq(from=agelims[1], to=agelims[2])
+preds=predict(fit,newdata=list(age=age.grid),se=TRUE)
+se.bands=cbind(preds$fit+2*preds$se, preds$fit-2*preds$se)
+plot(Wage$age, Wage$wage, col="darkgrey")
+lines(age.grid,preds$fit, lwd=2, col="blue")
+matlines(age.grid,se.bands, col="blue", lty=2)
+
+fita=lm(wage~age+I(age^2)+I(age^3)+I(age^4),data=Wage)
+summary(fita)
+# Different P(values), but same fitted
+plot(fitted(fit),fitted(fita))
+```
+
+Plots non-linear line and includes the standard errors interval. However, only works with single predictor models.
+
+#### Using ANOVA
+```{r}
+fita=lm(wage~education, data=Wage)
+fitb=lm(wage~education+age, data=Wage)
+fitc=lm(wage~education+poly(age,2), data=Wage)
+fitd=lm(wage~education+poly(age,3), data=Wage)
+anova(fita,fitb,fitc,fitd)
+```
+Indicates that education and age^2 is the best model
+
+#### Logistic Polynomial Regression
+```{r}
+str(Wage)
+fit=glm(I(wage>250)~poly(age,3), data=Wage, family=binomial)
+summary(fit)
+preds=predict(fit,list(age=age.grid),se=T)
+se.bands=preds$fit + cbind(fit=0,lower=-2*preds$se,uper=2*preds$se)
+se.bands[1:5,]
+```
+$$p=\frac{e^\eta}{1+e^\eta}.$$
+```{r}
+prob.bands=exp(se.bands)/(1+exp(se.bands))
+matplot(age.grid,prob.bands,col="blue",lwd=c(2,1,1),lty=c(1,2,2),type="l",ylim=c(0,.1))
+points(jitter(Wage$age),I(Wage$wage>250)/10,pch="l", cex=.5)
+```
+
+Manual computation of the probability. Could have used type="response" in predict() function for same results.
+
+## Splines: Cubic and Smooth
+```{r}
+require(splines)
+fit=lm(wage~bs(age,knots=c(25,40,60)),data=Wage)
+plot(Wage$age,Wage$wage, col="darkgrey")
+lines(age.grid,predict(fit,list(age=age.grid)),col="darkgreen",lwd=2)
+abline(v=c(25,40,60),lty=2, col="darkgreen")
+#Add Smooth
+fit.s=smooth.spline(Wage$age, Wage$wage,cv=TRUE)
+fit.s$df
+lines(fit.s,col="purple",lwd=2)
+legend ("topright",legend =c("Cubic Polynomial" ,"Smooth Spline"), col=c("darkgreen "," purple "),lty =1, lwd =2, cex =.8)
+```
+
+Green: CUBIC POLYNOMIALS
+Splines are cubic polynomials. The dotted lines are places of discontinuity at the third derivative.
+Since these functions are local, does not have wild tail problem of polynomials.
+
+Purple: Smooth Spline
+This method optimizes the degree of freedom to provide best fit. DF= 6.8
+
+## Generalized Additive Models:
+```{r}
+require(gam)
+gam.m3=gam(wage~s(age,df=4)+s(year,df=4)+education,data=Wage)
+par(mfrow=c(1,3))
+plot(gam.m3,se=T, col="red")
+```
+
+s() [SPLINE] signifies degree of freedom of smoothing splines fitting. (I believe polynomial of 4)
+ns() natural spline
+
+This output is beautiful, providing a clear look at the trends as sub chunks.
+
+```{r}
+gam.m1 <- gam(wage~s(age,5)+education,data=Wage)
+gam.m2 <- gam(wage~year+s(age,5)+education,data=Wage)
+anova(gam.m1,gam.m2,gam.m3, test="F")
+summary(gam.m3)
+```
+
+It appears like model 3 is not significant, which means that none-linear function of year is no good.
+
+None-linear function require for Age. 
+Use predict() to apply model.
+
+#### Local Regression
+```{r}
+require(akima)
+gam.lo=gam(wage~s(year,df=4)+lo(age ,span =0.7)+education,data=Wage)
+plot.Gam(gam.lo,se=TRUE,col ="green ")
+```
+
+Span parameter determines percent use of observations
+
+#### LREG- Interaction Term in GAM
+```{r, warning=FALSE}
+#Wonky, WARNING=F
+par(mfrow=c(1,2))
+gam.lo.i=gam(wage~lo(year,age,span =6)+education, data=Wage)
+plot(gam.lo.i, col="orange")
+summary(gam.lo.i)
+
+```
+
+
+### Categorical GAM
+```{r}
+par(mfrow=c(1,3))
+gam2=gam(I(wage>250)~s(age,df=4)+s(year,df=4)+education, data=Wage, family=binomial)
+plot(gam2, col="darkgreen", se=T)
+table(Wage$education,I(Wage$wage >250))
+```
+
+Plots contribution of the logit to the probably of each function
+
+No individuals without HS degree earn 250+. Therefore it really throws the third plot OFF
+
+#### Remove Under HS
+```{r}
+par(mfrow=c(1,3))
+gam.lr.s=gam (I(wage >250)~s(age ,df=5)+year+education ,family =
+binomial ,data=Wage ,subset =( education !="1. < HS Grad"))
+plot(gam.lr.s,se=T,col =" green ")
+```
+
+#### Test whether polynomial Year is needed
+```{r}
+gam2a=gam(I(wage>250)~s(age,df=4)+year+education, data=Wage, family=binomial)
+anova(gam2a,gam2,test="Chisq")
+```
+
+For [2], p-value .8242 is not significant.
+
+```{r fig.width=10,fig.height=5}
+par(mfrow=c(1,3))
+lm1 <- lm(wage~ns(age,df=3)+ns(year,df=4)+education, data=Wage)
+plot.Gam(lm1,se=T, col="blue")
+
+```
+
+# Unsupervised Learning
+## Clustering
+```{r}
+require(fpc)
+names(Smarket)
+str(Smarket)
+#Exploration
+#Color is useful when used for dependent variable/ binary Response variable!
+pairs(Smarket,col=Smarket$Direction) 
+
+#K-Means
+?kmeans()
+fit = kmeans(Smarket[,2:4], 2, nstart=30)
+## Nstart is the amount of times the centroids are randomly placed. Model with
+str(fit)
+fit$tot.withinss # Minimize this for best model (why we have NSTART)
+plotcluster(Smarket[,2:4], fit$cluster)
+?plotcluster
+```
+
+The two clusters are cut vertically at zero.
+
+## Hierachical Clustering
+```{r}
+
+
+
+```
+
+## Principle Components Analysis
+```{r}
+str(USArrests)
+head(USArrests)
+apply(USArrests,2,mean) # 1 for row, 2 for COL
+apply(USArrests,2,var)
+```
+
+```{r}
+# Need to Scale
+pr.out =prcomp (USArrests , scale =TRUE)
+
+pr.out$center # Mean
+pr.out$scale # stdev
+pr.out$rotation # Loading vector, multiplied with X matrix to aquire cordinates.
+
+# Plot
+biplot(pr.out,scale=0)
+
+# Invert with negative
+pr.out$rotation=-pr.out$rotation
+pr.out$x=-pr.out$x
+biplot (pr.out , scale =0)
+
+# Accessing Variance Contribution
+pr.out$sdev
+pr.var <- pr.out$sdev^2
+pr.var
+
+pve <- pr.var/sum(pr.var) # Percent contribution to variance by component
+
+# Plot the variance contribution
+par(mfrow=c(1,2))
+plot(pve,xlab="Principal Component", ylab="Proportion of Variance Explained", ylim=c(0,1),type="b")
+plot(cumsum(pve ), xlab=" Principal Component ", ylab ="Cumulative Proportion of Variance Explained ", ylim=c(0,1),type="b")
+```
