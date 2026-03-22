@@ -1,0 +1,10 @@
+[project]
+name = "denver-cpi"
+version = "0.1.0"
+description = "Denver CPI analysis - Kaggle dataset"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2.0",
+    "plotly>=5.24.0",
+    "notebook>=7.0.0",
+]
