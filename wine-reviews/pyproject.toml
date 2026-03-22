@@ -1,0 +1,11 @@
+[project]
+name = "wine-reviews"
+version = "0.1.0"
+description = "Wine reviews analysis - Kaggle dataset (zynicide/wine-reviews)"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2.0",
+    "plotly>=5.24.0",
+    "statsmodels>=0.14.0",
+    "notebook>=7.0.0",
+]
