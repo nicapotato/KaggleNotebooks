@@ -1,0 +1,11 @@
+[project]
+name = "air-travel-carrier-operations"
+version = "0.1.0"
+description = "Air travel carrier ops — Kaggle zkskhurram/airline-ticket-prices-vs-oil-and-fuel-costs"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2.0",
+    "plotly>=5.24.0",
+    "statsmodels>=0.14.0",
+    "notebook>=7.0.0",
+]
