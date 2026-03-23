@@ -1,0 +1,11 @@
+*.h5
+*.keras
+*.tsv
+*.csv
+*.parquet
+
+__pycache__
+# tutorial script outputs
+
+# FordA copies created when running notebooks from keras/notebooks/
+notebooks/data/
