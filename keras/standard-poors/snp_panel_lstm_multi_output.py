@@ -294,7 +294,11 @@ def main() -> None:
         panel_prices, panel_dates = synthetic_aligned_panel(n_rows, tickers, seed=42)
         print(f"[debug] Synthetic panel: {len(panel_prices)} rows × {len(tickers)} tickers")
     else:
-        raw = os.environ.get("SNP_TICKERS", "AAPL,MSFT,GOOG,AMZN,JPM")
+        # Default avoids TSLA: often missing from camnugent `all_stocks_5yr` (Name column).
+        raw = os.environ.get(
+            "SNP_TICKERS",
+            "AAPL,MSFT,GOOG,AMZN,JPM,NVDA,CSCO,V,XOM,WMT,JNJ,UNH,PG,DIS,BAC",
+        )
         tickers = parse_tickers(raw)
         lookback = int(os.environ.get("SNP_LOOKBACK", "60"))
         horizon = int(os.environ.get("SNP_HORIZON", "20"))
@@ -339,7 +343,7 @@ def main() -> None:
         epochs=epochs,
         batch_size=batch_size,
         callbacks=[es],
-        verbose=1,
+        verbose=2,
     )
     print(f"Finished after {len(history.history['loss'])} epochs (max {epochs})")
 
