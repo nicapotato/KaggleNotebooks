@@ -1,3 +1,10 @@
 kaggle.ipynb
 .DS_STORE
+.ipynb_checkpoints
+.venv
+uv.lock
 
+*.json
+*.csv
+*.parquet
+*.zip
