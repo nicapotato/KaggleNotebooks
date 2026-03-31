@@ -44,4 +44,10 @@ nbconvert-timeseries-classification:
 
 nbconvert-snp:
 	uv run jupyter nbconvert --execute --to notebook --inplace \
-		--ClearOutputPreprocessor.enabled=True standard-poors/timeseries-multi-output-snp.ipynb
+		--ClearOutputPreprocessor.enabled=True standards-poor-darkmatter/SP500-Multi-Output-DarkMatter-25Y.ipynb
+
+# Smoke test (synthetic data; no kagglehub download)
+.PHONY: nbconvert-snp-debug
+nbconvert-snp-debug:
+	SNP_DEBUG_SYNTHETIC=1 SNP_EPOCHS=3 SNP_BATCH=32 uv run jupyter nbconvert --execute --to notebook --inplace \
+		--ClearOutputPreprocessor.enabled=True standards-poor-darkmatter/SP500-Multi-Output-DarkMatter-25Y.ipynb
