@@ -8,4 +8,7 @@ dependencies = [
     "plotly>=5.24.0",
     "notebook>=7.0.0",
     "statsmodels>=0.14.6",
+    "kagglehub>=1.0.0",
+    "matplotlib>=3.10.8",
+    "seaborn>=0.13.2",
 ]
