@@ -1,6 +1,6 @@
-# EDA notebooks (UV) — OSRS skills, global war cost, scientific redactions
-.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions notebook-ai notebook-usda notebook-spotify \
-	execute execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, global war cost, scientific redactions, AI workforce, teen mental health, AI dependency students
+.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions notebook-ai notebook-ai-student notebook-usda notebook-spotify notebook-teen-mh notebook-gen-z \
+	execute execute-osrs execute-war execute-redactions execute-ai execute-ai-student execute-usda execute-spotify execute-teen-mh execute-gen-z execute-all notebook-server
 
 # --- Data (optional local downloads; many notebooks use kagglehub inline) ---
 data: data-osrs
@@ -29,6 +29,15 @@ notebook-usda:
 notebook-spotify:
 	uv run jupyter notebook spotify-eda-2014-2026.ipynb
 
+notebook-teen-mh:
+	uv run jupyter notebook teen-mental-health-eda.ipynb
+
+notebook-ai-student:
+	uv run jupyter notebook ai-dependency-student.ipynb
+
+notebook-gen-z:
+	uv run jupyter notebook gen-z-social-media-usage.ipynb
+
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
@@ -50,7 +59,16 @@ execute-usda:
 execute-spotify:
 	uv run jupyter nbconvert --execute --to notebook --inplace spotify-eda-2014-2026.ipynb
 
-execute-all: execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify
+execute-teen-mh:
+	uv run jupyter nbconvert --execute --to notebook --inplace teen-mental-health-eda.ipynb
+
+execute-ai-student:
+	uv run jupyter nbconvert --execute --to notebook --inplace ai-dependency-student.ipynb
+
+execute-gen-z:
+	uv run jupyter nbconvert --execute --to notebook --inplace gen-z-social-media-usage.ipynb
+
+execute-all: execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student
 
 notebook-server:
 	uv run jupyter notebook
