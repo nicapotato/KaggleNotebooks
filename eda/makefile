@@ -1,6 +1,6 @@
 # EDA notebooks (UV) — OSRS skills, global war cost, scientific redactions
-.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions \
-	execute execute-osrs execute-war execute-redactions execute-all notebook-server
+.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions notebook-ai notebook-usda notebook-spotify \
+	execute execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify execute-all notebook-server
 
 # --- Data (optional local downloads; many notebooks use kagglehub inline) ---
 data: data-osrs
@@ -20,6 +20,15 @@ notebook-war:
 notebook-redactions:
 	uv run jupyter notebook redactions-eda.ipynb
 
+notebook-ai:
+	uv run jupyter notebook ai-workforce-displacement.ipynb
+
+notebook-usda:
+	uv run jupyter notebook usda-food-analysis.ipynb
+
+notebook-spotify:
+	uv run jupyter notebook spotify-eda-2014-2026.ipynb
+
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
@@ -32,7 +41,16 @@ execute-war:
 execute-redactions:
 	uv run jupyter nbconvert --execute --to notebook --inplace redactions-eda.ipynb
 
-execute-all: execute-osrs execute-war execute-redactions
+execute-ai:
+	uv run jupyter nbconvert --execute --to notebook --inplace ai-workforce-displacement.ipynb
+
+execute-usda:
+	uv run jupyter nbconvert --execute --to notebook --inplace usda-food-analysis.ipynb
+
+execute-spotify:
+	uv run jupyter nbconvert --execute --to notebook --inplace spotify-eda-2014-2026.ipynb
+
+execute-all: execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify
 
 notebook-server:
 	uv run jupyter notebook

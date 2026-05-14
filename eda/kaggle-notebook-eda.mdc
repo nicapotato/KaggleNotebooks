@@ -1,0 +1,63 @@
+---
+alwaysApply: true
+---
+
+
+Kaggle python jupyter notebooks. These must be able to run locally on my mac m3 using uv and .venv inside shared python dependency eda folder. 
+
+The other notebooks in KaggleNotebooks repo are kaggle exports, and dont have the data locally on disk, so stick to eda folder.
+
+All code must be inside the kaggle notebook, no external py file for dependencies - this is because it would prevent me from a neat "One File" notebook to be shared on kaggle.
+
+Data Management:
+- Must be able to run notebook locally using kagglehub:
+
+"""
+
+Kaggle Website Notebook compatible and KaggleHub Local Mac Compatible:
+"""
+import kagglehub
+
+CSV_NAME = "global_conflicts_dataset.csv"
+
+
+def resolve_csv_path() -> Path:
+    kaggle_root = Path("/kaggle/input")
+    if kaggle_root.exists():
+        for p in kaggle_root.rglob(CSV_NAME):
+            return p
+    local_data = Path("data") / CSV_NAME
+    if local_data.exists():
+        return local_data
+    path = kagglehub.dataset_download(
+        "khushikyad001/global-war-and-conflict-impact-dataset-19502024"
+    )
+    p = Path(path) / CSV_NAME
+    assert p.exists(), f"expected {CSV_NAME} under {path}"
+    return p
+
+
+csv_path = resolve_csv_path()
+print("CSV:", csv_path)
+
+df = pd.read_csv(csv_path, low_memory=False)
+print(df.shape[0], "rows ×", df.shape[1], "cols")
+df.head()
+"""
+
+EDA Strategy:
+1 - Start by showing some of the table content sample (df.sample(5)), and showing table datatypes and dimensions
+2 - Single variate analysis. Value Count categorical data, show distribution for continuous variable. Reflect on the results and what it means for the user objective
+3 - Multivariate analysis of interesting variables. two categorical - crosstabulate to find important pattern. two numerical - correlation plot. categorical and numerical - box plot
+
+Other requirements:
+- always test notebook by using makefile target (uv run nbconvert command) to ensure code produced works locally (acceptance criteria)
+- ensure the output has a AI agent compatible output (perhaps jupyter cell output text, or image if AI can intepret the findings). Agent intepretations should be put inside the notebook.
+
+Code Strategy:
+- Clear code without "fallbacks data imputation" for key parameters, do not support legacy impelementaiton/features.
+
+Libraries:
+- EDA and plots: seaborn, matplotlib
+- Data: Pandas
+- Scientific computing: scipy, numpy, sklearn
