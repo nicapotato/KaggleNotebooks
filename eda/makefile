@@ -1,6 +1,6 @@
-# EDA notebooks (UV) — OSRS skills, global war cost, scientific redactions, AI workforce, teen mental health, AI dependency students
-.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions notebook-ai notebook-ai-student notebook-usda notebook-spotify notebook-teen-mh notebook-gen-z \
-	execute execute-osrs execute-war execute-redactions execute-ai execute-ai-student execute-usda execute-spotify execute-teen-mh execute-gen-z execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, global war cost, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, gaming vs academic performance, food delivery
+.PHONY: data data-osrs notebook notebook-osrs notebook-war notebook-redactions notebook-ai notebook-ai-student notebook-student-perf notebook-usda notebook-spotify notebook-teen-mh notebook-gen-z notebook-gaming-vs-academic notebook-food-delivery \
+	execute execute-osrs execute-war execute-redactions execute-ai execute-ai-student execute-student-perf execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-all notebook-server
 
 # --- Data (optional local downloads; many notebooks use kagglehub inline) ---
 data: data-osrs
@@ -35,8 +35,17 @@ notebook-teen-mh:
 notebook-ai-student:
 	uv run jupyter notebook ai-dependency-student.ipynb
 
+notebook-student-perf:
+	uv run jupyter notebook student-performance-prediction-eda.ipynb
+
 notebook-gen-z:
-	uv run jupyter notebook gen-z-social-media-usage.ipynb
+	uv run jupyter notebook gen-z-social-media-usage-eda.ipynb
+
+notebook-gaming-vs-academic:
+	uv run jupyter notebook gaming-vs-academic-performance-eda.ipynb
+
+notebook-food-delivery:
+	uv run jupyter notebook food-delivery-operations-and-customer-analytics-eda.ipynb
 
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
@@ -65,10 +74,19 @@ execute-teen-mh:
 execute-ai-student:
 	uv run jupyter nbconvert --execute --to notebook --inplace ai-dependency-student.ipynb
 
-execute-gen-z:
-	uv run jupyter nbconvert --execute --to notebook --inplace gen-z-social-media-usage.ipynb
+execute-student-perf:
+	uv run jupyter nbconvert --execute --to notebook --inplace student-performance-prediction-eda.ipynb
 
-execute-all: execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student
+execute-gen-z:
+	uv run jupyter nbconvert --execute --to notebook --inplace gen-z-social-media-usage-eda.ipynb
+
+execute-gaming-vs-academic:
+	uv run jupyter nbconvert --execute --to notebook --inplace gaming-vs-academic-performance-eda.ipynb
+
+execute-food-delivery:
+	uv run jupyter nbconvert --execute --to notebook --inplace food-delivery-operations-and-customer-analytics-eda.ipynb
+
+execute-all: execute-osrs execute-war execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-gaming-vs-academic execute-food-delivery
 
 notebook-server:
 	uv run jupyter notebook
