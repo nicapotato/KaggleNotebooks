@@ -47,12 +47,15 @@ df.head()
 
 EDA Strategy:
 1 - Start by showing some of the table content sample (df.sample(5)), and showing table datatypes and dimensions
-2 - Single variate analysis. Value Count categorical data, show distribution for continuous variable. Reflect on the results and what it means for the user objective
-3 - Multivariate analysis of interesting variables. two categorical - crosstabulate to find important pattern. two numerical - correlation plot. categorical and numerical - box plot
+2 - Single variate analysis. Value Count categorical data, show distribution for continuous variable. Reflect on the results and what it means for the user objective. use facet grid to show all the distributions (numerical, or categorical grouping) 
+3 - Multivariate analysis of interesting variables. two categorical - crosstabulate to find important pattern. two numerical - correlation plot. categorical and numerical - box plot,
+    - seaborn lmplot to understand correlations (further stratify using hue or col for deaper pattern finding)
+    - crosstabulate, or pivot table. nicely presented in a heatmap, or formated html table (with background shading)
 
 Other requirements:
 - always test notebook by using makefile target (uv run nbconvert command) to ensure code produced works locally (acceptance criteria)
 - ensure the output has a AI agent compatible output (perhaps jupyter cell output text, or image if AI can intepret the findings). Agent intepretations should be put inside the notebook. Dont mention that its for agents, or that agents coded the notebook
+- always be sure the legend the to the right of the plot, not inside plot itself (x/y axis..).
 
 Code Strategy:
 - Clear code without "fallbacks data imputation" for key parameters, do not support legacy impelementaiton/features.
