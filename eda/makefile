@@ -1,5 +1,5 @@
-# EDA notebooks (UV) — OSRS skills, global war cost, global poverty/inequality, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, gaming vs academic performance, food delivery
-.PHONY: execute execute-osrs execute-war execute-global-poverty execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery
+.PHONY: execute execute-osrs execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-all notebook-server
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
@@ -11,6 +11,9 @@ execute-war:
 
 execute-global-poverty:
 	uv run jupyter nbconvert --execute --to notebook --inplace global-poverty-and-inequality.ipynb
+
+execute-banking-fraud:
+	uv run jupyter nbconvert --execute --to notebook --inplace banking-fraud-detection-eda.ipynb
 
 execute-companie-reviews:
 	uv run jupyter nbconvert --execute --to notebook --inplace companie-reviews-salary.ipynb
@@ -36,6 +39,9 @@ execute-ai-student:
 execute-student-perf:
 	uv run jupyter nbconvert --execute --to notebook --inplace student-performance-prediction-eda.ipynb
 
+execute-student-ai-tools:
+	uv run jupyter nbconvert --execute --to notebook --inplace student-ai-tools.ipynb
+
 execute-gen-z:
 	uv run jupyter nbconvert --execute --to notebook --inplace gen-z-social-media-usage-eda.ipynb
 
@@ -45,7 +51,7 @@ execute-gaming-vs-academic:
 execute-food-delivery:
 	uv run jupyter nbconvert --execute --to notebook --inplace food-delivery-operations-and-customer-analytics-eda.ipynb
 
-execute-all: execute-osrs execute-war execute-global-poverty execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-gen-z execute-gaming-vs-academic execute-food-delivery
+execute-all: execute-osrs execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery
 
 notebook-server:
 	uv run jupyter notebook
