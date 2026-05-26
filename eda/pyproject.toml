@@ -15,4 +15,5 @@ dependencies = [
     "scikit-learn>=1.4.0",
     "wordcloud>=1.9.4",
     "nicaviz>=0.1.4",
+    "pyarrow>=24.0.0",
 ]

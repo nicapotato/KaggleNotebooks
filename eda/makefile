@@ -1,10 +1,13 @@
-# EDA notebooks (UV) — OSRS skills, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery
-.PHONY: execute execute-osrs execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, OSRS money-making guides, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery, Hacker News
+.PHONY: execute execute-osrs execute-osrs-mmg execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-all notebook-server
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
 execute-osrs:
 	uv run jupyter nbconvert --execute --to notebook --inplace osrs-skills-eda.ipynb
+
+execute-osrs-mmg:
+	uv run jupyter nbconvert --execute --to notebook --inplace osrs-money-making-guides-eda.ipynb
 
 execute-war:
 	uv run jupyter nbconvert --execute --to notebook --inplace global-war-and-cost.ipynb
@@ -51,7 +54,10 @@ execute-gaming-vs-academic:
 execute-food-delivery:
 	uv run jupyter nbconvert --execute --to notebook --inplace food-delivery-operations-and-customer-analytics-eda.ipynb
 
-execute-all: execute-osrs execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery
+execute-hacker-news:
+	uv run jupyter nbconvert --execute --to notebook --inplace hacker-news-eda.ipynb
+
+execute-all: execute-osrs execute-osrs-mmg execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news
 
 notebook-server:
 	uv run jupyter notebook
