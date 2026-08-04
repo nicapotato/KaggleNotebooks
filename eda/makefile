@@ -1,5 +1,5 @@
-# EDA notebooks (UV) — OSRS skills, OSRS money-making guides, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery, Hacker News
-.PHONY: execute execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, OSRS money-making guides, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery, Hacker News, speed dating, guided speed dating
+.PHONY: execute execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating execute-all notebook-server
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
@@ -63,7 +63,13 @@ execute-hacker-news:
 execute-hacker-news-daily:
 	uv run jupyter nbconvert --execute --to notebook --inplace hacker-news-daily-scrape-eda.ipynb
 
-execute-all: execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily
+execute-speed-dating:
+	uv run jupyter nbconvert --execute --to notebook --inplace speed-dating-attraction-eda.ipynb
+
+execute-guided-speed-dating:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-speed-dating-attraction-exploration.ipynb
+
+execute-all: execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating
 
 notebook-server:
 	uv run jupyter notebook
