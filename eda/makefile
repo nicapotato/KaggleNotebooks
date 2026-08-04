@@ -1,5 +1,5 @@
-# EDA notebooks (UV) — OSRS skills, OSRS money-making guides, global war cost, global poverty/inequality, banking fraud, company reviews/salaries, scientific redactions, AI workforce, teen mental health, AI dependency students, student performance, student AI tools, gaming vs academic performance, food delivery, Hacker News, speed dating, guided speed dating, guided movies/everest/dog-adoption/hiv/breast-methylation, guided postural/full-spectrum/transcriptomic/banking-tx/powerlifting/ai-salaries-2026
-.PHONY: execute execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating execute-guided-movies execute-guided-everest execute-guided-dog-adoption execute-guided-hiv execute-guided-breast-methylation execute-guided-postural execute-guided-full-spectrum execute-guided-transcriptomic execute-guided-banking-tx execute-guided-powerlifting execute-guided-ai-salaries-2026 execute-all notebook-server
+# EDA notebooks (UV) — OSRS skills, money-makers, war, poverty, banking fraud, reviews, redactions, AI workforce, teen MH, students, gaming, food delivery, HN, speed dating, guided notebooks (+ india-funding/gold/minerals/cables/msft)
+.PHONY: execute execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-ai-student execute-student-perf execute-student-ai-tools execute-usda execute-spotify execute-teen-mh execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating execute-guided-movies execute-guided-everest execute-guided-dog-adoption execute-guided-hiv execute-guided-breast-methylation execute-guided-postural execute-guided-full-spectrum execute-guided-transcriptomic execute-guided-banking-tx execute-guided-powerlifting execute-guided-ai-salaries-2026 execute-guided-battery execute-guided-startups execute-guided-ericsson-patents execute-guided-ai-arena execute-guided-india-funding execute-guided-gold execute-guided-minerals execute-guided-cables execute-guided-msft execute-all notebook-server
 # --- Execute notebooks in place (clears then runs; saves outputs) ---
 execute: execute-osrs
 
@@ -102,7 +102,34 @@ execute-guided-powerlifting:
 execute-guided-ai-salaries-2026:
 	uv run jupyter nbconvert --execute --to notebook --inplace guided-ai-ds-job-salaries-2026-exploration.ipynb
 
-execute-all: execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating execute-guided-movies execute-guided-everest execute-guided-dog-adoption execute-guided-hiv execute-guided-breast-methylation execute-guided-full-spectrum execute-guided-transcriptomic execute-guided-postural execute-guided-ai-salaries-2026 execute-guided-powerlifting execute-guided-banking-tx
+execute-guided-battery:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-laptop-battery-health-exploration.ipynb
+
+execute-guided-startups:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-global-tech-startups-pipeline-exploration.ipynb
+
+execute-guided-ericsson-patents:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-ericsson-patent-evolution-exploration.ipynb
+
+execute-guided-ai-arena:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-ai-model-arena-rankings-exploration.ipynb
+
+execute-guided-india-funding:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-indian-startup-funding-exploration.ipynb
+
+execute-guided-gold:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-gold-price-analysis-exploration.ipynb
+
+execute-guided-minerals:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-critical-minerals-rare-earths-exploration.ipynb
+
+execute-guided-cables:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-undersea-cables-infrastructure-exploration.ipynb
+
+execute-guided-msft:
+	uv run jupyter nbconvert --execute --to notebook --inplace guided-microsoft-msft-exploration.ipynb
+
+execute-all: execute-osrs execute-osrs-mmg execute-osrs-mmg-daily execute-war execute-global-poverty execute-banking-fraud execute-companie-reviews execute-redactions execute-ai execute-usda execute-spotify execute-teen-mh execute-ai-student execute-student-perf execute-student-ai-tools execute-gen-z execute-gaming-vs-academic execute-food-delivery execute-hacker-news execute-hacker-news-daily execute-speed-dating execute-guided-speed-dating execute-guided-movies execute-guided-everest execute-guided-dog-adoption execute-guided-hiv execute-guided-breast-methylation execute-guided-full-spectrum execute-guided-transcriptomic execute-guided-postural execute-guided-ai-salaries-2026 execute-guided-powerlifting execute-guided-banking-tx execute-guided-battery execute-guided-startups execute-guided-ericsson-patents execute-guided-ai-arena execute-guided-india-funding execute-guided-gold execute-guided-minerals execute-guided-cables execute-guided-msft
 
 notebook-server:
 	uv run jupyter notebook
